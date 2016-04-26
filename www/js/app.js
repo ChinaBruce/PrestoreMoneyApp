@@ -22,3 +22,35 @@ angular.module('starter', ['ionic', 'starter.controllers'])
     }
   });
 })
+
+.config(function($stateProvider, $urlRouterProvider) {
+  $stateProvider.state('app',{
+    url: '/app',
+    abstract: true,
+    templateUrl: 'templates/menu.html',
+    controller: 'appCtrl'
+  })
+  .state('login',{
+      url:'/login',
+      templateUrl:'templates/login.html',
+      controller:'loginCtrl'
+  })
+  .state('app.search', {
+    url: '/search',
+    views: {
+      'menuContent': {
+        templateUrl: 'templates/search.html'
+      }
+    }
+  })
+
+  .state('app.record', {
+      url: '/record',
+      views: {
+        'menuContent': {
+          templateUrl: 'templates/record.html'
+        }
+      }
+    })
+    $urlRouterProvider.otherwise('/login');
+});
