@@ -4,8 +4,10 @@ angular.module('starter.controllers', [])
             $state.go('login');
         }
     })
-    .controller("loginCtrl", function ($scope, $http, $state,$cordovaAppVersion) {
-        $scope.user.version = $cordovaAppVersion.getVersionNumber() //获取版本号
+    .controller("loginCtrl", function ($scope, $http, $state, $cordovaAppVersion) {
+        $cordovaAppVersion.getVersionNumber().then(function (version) {
+            $scope.version = version;
+        });
         $scope.login = function () {
             // var data = 'name=' + $scope.user.name + '&password=' + $scope.user.password + '&deviceType=1&deviceUniqueId=123testsdsdfsdf';
             // var timestamp = (new Date()).valueOf();
@@ -19,6 +21,7 @@ angular.module('starter.controllers', [])
             // }).error(function (data) {
             //     console.log(data);
             // });
+
             $state.go('app.record');
         }
     });

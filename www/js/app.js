@@ -3,9 +3,11 @@
 // angular.module is a global place for creating, registering and retrieving Angular modules
 // 'starter' is the name of this angular module example (also set in a <body> attribute in index.html)
 // the 2nd parameter is an array of 'requires'
-angular.module('starter', ['ionic', 'starter.controllers','$cordovaAppVersion'])
+var remoteUrl = "http://192.168.51.52:88/api/";
+var signatureKey = "prestoremoney.common.2016";
+angular.module('starter', ['ionic', 'starter.controllers','ngCordova'])
 
-  .run(function ($ionicPlatform) {
+  .run(function ($ionicPlatform, $cordovaAppVersion) {
     $ionicPlatform.ready(function () {
       if (window.cordova && window.cordova.plugins.Keyboard) {
         // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
@@ -20,6 +22,7 @@ angular.module('starter', ['ionic', 'starter.controllers','$cordovaAppVersion'])
       if (window.StatusBar) {
         StatusBar.styleDefault();
       }
+            
     });
   })
 
