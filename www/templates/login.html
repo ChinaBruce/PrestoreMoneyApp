@@ -6,7 +6,7 @@
     <div class="list">
         <label class="item item-input">
           <span class="input-label">账户</span>
-          <input type="text" ng-model="user.name" placeholder="请输入您账户名">
+          <input type="text" ng-model="user.username" placeholder="请输入您账户名">
         </label>
         <label class="item item-input">
           <span class="input-label">密码</span>
@@ -14,7 +14,7 @@
         </label>
         <ion-checkbox ng-model="user.isremember">记住密码</ion-checkbox>
         <div class="padding">
-          <button class="button button-block button-positive" ng-click="login()">立即登陆</button>
+          <button class="button button-block button-positive" ng-click="doLogin()">立即登陆</button>
           <p class="text-center">
             版本号：<span ng-bind="version"></span>
           </p>
