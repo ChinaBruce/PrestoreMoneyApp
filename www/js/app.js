@@ -3,11 +3,13 @@
 // angular.module is a global place for creating, registering and retrieving Angular modules
 // 'starter' is the name of this angular module example (also set in a <body> attribute in index.html)
 // the 2nd parameter is an array of 'requires'
-var remoteUrl = "http://192.168.57.180:45429/api/";//"http://121.28.95.78:93/api/";
+var remoteUrl = "http://121.28.95.78:93/api/";//"http://121.28.95.78:93/api/";  192.168.51.52:45429
 var signatureKey = "prestoremoney.common.2016";
 var token = "";
+var UUID = "";
+
 angular.module('starter', ['ionic', 'starter.controllers', 'ngCordova'])
-  .run(['$ionicPlatform','$rootScope','$cordovaAppVersion',function ($ionicPlatform, $rootScope, $cordovaAppVersion) {
+  .run(['$ionicPlatform', '$rootScope', '$cordovaAppVersion', '$ionicPopup', '$location', '$ionicHistory', '$cordovaToast', function ($ionicPlatform, $rootScope, $cordovaAppVersion, $ionicPopup, $location, $ionicHistory, $cordovaToast) {
     $ionicPlatform.ready(function ($rootScope) {
       if (window.cordova && window.cordova.plugins.Keyboard) {
         // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
@@ -22,13 +24,42 @@ angular.module('starter', ['ionic', 'starter.controllers', 'ngCordova'])
       if (window.StatusBar) {
         StatusBar.styleDefault();
       }
-      
-      function GetAppVersion() {
-        $cordovaAppVersion.getVersionNumber().then(function (data) {
-          $rootScope.version = data;
-        });
-      }
+
     });
+
+    //双击退出  
+    $ionicPlatform.registerBackButtonAction(function (e) {
+      //判断处于哪个页面时双击退出  
+      if ($location.path() == '/app/record' || $location.path() == '/app/search') {
+        if ($rootScope.backButtonPressedOnceToExit) {
+          ionic.Platform.exitApp();
+        } else {
+          $rootScope.backButtonPressedOnceToExit = true;
+          $cordovaToast.showShortTop('再按一次退出系统');
+          setTimeout(function () {
+            $rootScope.backButtonPressedOnceToExit = false;
+          }, 2000);
+        }
+      }
+      else if ($location.path() == '/login') {
+        ionic.Platform.exitApp();
+      }
+      else if ($ionicHistory.backView()) {
+        $ionicHistory.goBack();
+      } else {
+        if ($rootScope.backButtonPressedOnceToExit) {
+          ionic.Platform.exitApp();
+        } else {
+          $rootScope.backButtonPressedOnceToExit = true;
+          $cordovaToast.showShortTop('再按一次退出系统');
+          setTimeout(function () {
+            $rootScope.backButtonPressedOnceToExit = false;
+          }, 2000);
+        }
+      }
+      e.preventDefault();
+      return false;
+    }, 101);
   }])
 
   .config(function ($stateProvider, $urlRouterProvider) {
@@ -36,12 +67,14 @@ angular.module('starter', ['ionic', 'starter.controllers', 'ngCordova'])
       url: '/app',
       abstract: true,
       templateUrl: 'templates/menu.html',
-      controller: 'appCtrl'
+      controller: 'appCtrl',
+      cache: false
     })
       .state('login', {
         url: '/login',
         templateUrl: 'templates/login.html',
-        controller: 'loginCtrl'
+        controller: 'loginCtrl',
+        cache: false
       })
       .state('app.search', {
         url: '/search',
@@ -49,7 +82,8 @@ angular.module('starter', ['ionic', 'starter.controllers', 'ngCordova'])
           'menuContent': {
             templateUrl: 'templates/search.html'
           }
-        }
+        },
+        cache: false
       })
 
       .state('app.record', {
@@ -58,8 +92,15 @@ angular.module('starter', ['ionic', 'starter.controllers', 'ngCordova'])
           'menuContent': {
             templateUrl: 'templates/record.html'
           }
-        }
+        },
+        cache: false
       })
-    $urlRouterProvider.otherwise('/login');
-  });
 
+    if (window.localStorage.getItem("token") != null) {
+      token = window.localStorage.getItem("token");
+      $urlRouterProvider.otherwise('/app/record');
+    }
+    else {
+      $urlRouterProvider.otherwise('/login');
+    }
+  });
