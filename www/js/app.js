@@ -7,6 +7,7 @@ var remoteUrl = "http://121.28.95.78:93/api/";//"http://121.28.95.78:93/api/";  
 var signatureKey = "prestoremoney.common.2016";
 var token = "";
 var UUID = "";
+var loginUser = {};
 
 angular.module('starter', ['ionic', 'starter.controllers', 'ngCordova'])
   .run(['$ionicPlatform', '$rootScope', '$cordovaAppVersion', '$ionicPopup', '$location', '$ionicHistory', '$cordovaToast', function ($ionicPlatform, $rootScope, $cordovaAppVersion, $ionicPopup, $location, $ionicHistory, $cordovaToast) {
@@ -95,9 +96,10 @@ angular.module('starter', ['ionic', 'starter.controllers', 'ngCordova'])
         },
         cache: false
       })
-
-    if (window.localStorage.getItem("token") != null) {
-      token = window.localStorage.getItem("token");
+    var loginInfoString = window.localStorage.getItem("loginInfo");
+    if (loginInfoString != null && loginInfoString != "") {
+      loginUser = JSON.parse(loginInfoString);
+      token = loginUser.Token;
       $urlRouterProvider.otherwise('/app/record');
     }
     else {

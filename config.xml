@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <widget id="com.ionicframework.prestoremoneyapp290136" version="0.0.8" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
-  <name>PrestoreMoneyApp</name>
+  <name>预储金</name>
   <description>
-        An Ionic Framework and Cordova project.
+        石家庄劳务中心现场检查APP.
     </description>
   <author email="you@example.com" href="http://example.com.com/">
       Bruce
