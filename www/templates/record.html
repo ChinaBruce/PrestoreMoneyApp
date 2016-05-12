@@ -1,4 +1,17 @@
 <ion-view view-title="现场登记">
   <ion-content>
+    <div class="item item-divider">
+        检查内容
+      </div>
+    <ion-list>      
+      <ion-checkbox ng-repeat="item in items" ng-model="item.IsChecked" ng-true-value="true" ng-false-value="false">{{item.Name}}</ion-checkbox>
+    </ion-list>
+    <div class="item item-divider">
+      其它
+    </div>
+    <label class="item item-input" style="height:100px">
+      <textarea style="height:100px" ng-model="entity.elseRegulation" placeholder="请您输入发现的其他问题"></textarea>
+    </label>
+    <button class="button button-block button-positive" ng-click="save()">确定</button>
   </ion-content>
 </ion-view>

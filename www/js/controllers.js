@@ -1,44 +1,47 @@
 angular.module('starter.controllers', [])
-    .controller("appCtrl", function ($scope, $state, $http, $cordovaToast) {
+    .config(['$compileProvider', function($compileProvider){        
+        $compileProvider.aHrefSanitizationWhitelist(/^\s*(geo|mailto|tel|maps):/);
+    }])
+    .controller("menuCtrl", function ($scope, $state, $http, $cordovaToast) {
         $scope.loginName = loginUser.Name;
         $scope.logout = function () {
             var timestamp = (new Date()).valueOf();
             var signature = md5('Logout' + timestamp + signatureKey);
             $http({
-                method: 'GET',
+                method: 'PUT',
                 url: remoteUrl + 'Account/Logout',
-                headers: { 'apptype': '2', 'timestamp': timestamp, 'signature': signature, 'token': token }
+                headers: { 'apptype': apptype, 'timestamp': timestamp, 'signature': signature, 'token': token }
             }).success(function (response) {
-                window.localStorage.removeItem("loginInfo");                
+                window.localStorage.removeItem("loginInfo");
+                window.localStorage.removeItem("PrestoreAccount");
+                token = "";
+                UUID = "";
+                loginUser = null;
+                currentPAInfo = null;
                 $state.go('login');
             }).error(function (response) {
                 $cordovaToast.showShortTop(response.Message);
             });
         }
     })
+    //登录
     .controller("loginCtrl", function ($scope, $rootScope, $http, $state, $ionicPlatform, $cordovaToast, $cordovaDevice, $ionicLoading) {
-        $scope.user = {
-            username: "",
-            password: "",
-            isremember: false
-        };
-        $scope.appVersion = "";
-        $ionicPlatform.ready(function ($rootScope) {
+        $ionicPlatform.ready(function () {
             cordova.getAppVersion(function (version) {
                 $scope.appVersion = version;
             });
         });
+        $scope.initData = function () {
+            $scope.user = {
+                username: "",
+                password: "",
+                isremember: false
+            };
+            $scope.appVersion = "";
+        };
         $scope.doLogin = function () {
             UUID = $cordovaDevice.getUUID();
-            var apptype = 0;
-            if ($cordovaDevice.getPlatform() == "Android") {
-                apptype = 2;
-            }
-            else if ($cordovaDevice.getPlatform() == "iOS") {
-                apptype = 1;
-            }
-            if($scope.user.username == "" || $scope.user.password == "")
-            {
+            if ($scope.user.username == "" || $scope.user.password == "") {
                 $cordovaToast.showShortTop("请输入用户名和密码");
                 return;
             }
@@ -50,7 +53,7 @@ angular.module('starter.controllers', [])
                 maxWidth: 200,
                 showDelay: 0
             });
-            
+
             var data = 'name=' + $scope.user.username + '&password=' + md5($scope.user.password) + '&deviceUniqueId=' + UUID;
             var timestamp = (new Date()).valueOf();
             var signature = md5('Login' + timestamp + signatureKey);
@@ -62,23 +65,137 @@ angular.module('starter.controllers', [])
                 $ionicLoading.hide();
                 if (response.IsSuccess) {
                     loginUser = response.Data;
-                    if ($scope.user.isremember) {                        
+                    if ($scope.user.isremember) {
                         window.localStorage.setItem("loginInfo", JSON.stringify(loginUser));
                     }
                     else {
                         window.localStorage.clear();
                     }
                     token = loginUser.Token;
-                    $state.go('app.record');
+                    $state.go('app.home');
                 }
                 else {
                     $cordovaToast.showShortTop(response.Message);
-                }                
+                }
             }).error(function (response) {
                 $ionicLoading.hide();
-                $cordovaToast.showShortTop(response.Message);                
+                $cordovaToast.showShortTop(response.Message);
             });
         };
+    })
+    //查询
+    .controller("searchCtrl", function ($scope, $rootScope, $http, $state, $ionicLoading, $cordovaToast) {
+        $scope.items = {};
+        $scope.searchByKey = function (strInput) {
+            var timestamp = (new Date()).valueOf();
+            var signature = md5('Search' + timestamp + signatureKey);
+            $http({
+                method: 'GET',
+                url: remoteUrl + 'PrestoreAccounts?key=' + strInput,
+                headers: { 'apptype': apptype, 'timestamp': timestamp, 'signature': signature, 'token': token }
+            }).success(function (response) {
+                if (response.IsSuccess) {
+                    $scope.items = response.Data;
+                }
+                else {
+                    $cordovaToast.showShortTop(response.Message);
+                }
+            }).error(function (response) {
+                $cordovaToast.showShortTop(response.Message);
+            });
+        };
+
+        $scope.selectItem = function (item) {
+            if (item != undefined) {
+                currentPAInfo = item;
+                window.localStorage.setItem("PrestoreAccount", JSON.stringify(item));
+                $state.go("app.home");
+            }
+        };
+    })
+    //登记问题
+    .controller("recordCtrl", function ($scope, $rootScope, $http, $state, $ionicLoading, $cordovaToast) {
+        $scope.$on("$ionicView.enter", function (event, data) {
+            if (currentPAInfo == undefined) {
+                $state.go("app.search");
+            }
+        });
+        $scope.entity = {elseRegulation:""};
+        var timestamp = (new Date()).valueOf();
+        var signature = md5('GetDictionaryDetails' + timestamp + signatureKey);
+        $http({
+            method: 'GET',
+            url: remoteUrl + 'DictionaryDetails?code=03',
+            headers: { 'apptype': apptype, 'timestamp': timestamp, 'signature': signature }
+        }).success(function (response) {
+            if (response.IsSuccess) {
+                $scope.items = response.Data;
+            }
+            else {
+                $cordovaToast.showShortTop(response.Message);
+            }
+        }).error(function (response) {
+            $cordovaToast.showShortTop(response.Message);
+        });
+
+        $scope.save = function () {
+            var describtion = "";
+            $scope.items.forEach(function (element) {
+                if (element.IsChecked) {
+                    describtion += element.Name + "@"
+                }
+            }, this);
+            if ($scope.entity.elseRegulation != "") {
+                describtion += $scope.entity.elseRegulation + "@"
+            }
+            if (describtion != "") {
+                describtion = describtion.substring(0, describtion.length - 1);
+            }
+            var timestamp = (new Date()).valueOf();
+            var signature = md5('Add' + timestamp + signatureKey);
+            $http({
+                method: 'POST',
+                url: remoteUrl + 'LocaleRegulation',
+                data: JSON.stringify({ PrestoreAccountId: currentPAInfo.Id, CheckUserId: loginUser.UserId, Describe: describtion }),
+                headers: {'Content-Type':'application/json', 'apptype': apptype, 'timestamp': timestamp, 'signature': signature, 'token': token }
+            }).success(function (response) {
+                if (response.IsSuccess) {
+                    $scope.entity.elseRegulation = "";
+                    $scope.items.forEach(function (element) {
+                        element.IsChecked = false;
+                    }, this);
+                    $cordovaToast.showShortTop(response.Message);
+                }
+                else {
+                    $cordovaToast.showShortTop(response.Message);
+                }
+            }).error(function (response) {
+                $cordovaToast.showShortTop(response.Message);
+            });
+        };
+    })
+    //基本信息
+    .controller("homeCtrl", function ($scope, $rootScope, $http, $state, $ionicLoading, $cordovaToast) {
+        $scope.pavm = {};
+        $scope.$on("$ionicView.enter", function (event, data) {
+            if (currentPAInfo == undefined) {
+                $state.go("app.search");
+            }
+            else {
+                $scope.pavm = currentPAInfo;
+            }
+        });
+        $scope.SearchPA = function () {
+            $state.go("app.search");
+        };
+        $scope.phonecallTab = function(phonenumber) {
+            var call = "tel:" + phonenumber;
+            document.location.href = call;
+        };
+    })
+    //现场取证
+    .controller("takePicturesCtrl", function ($scope, $rootScope, $http, $state, $ionicLoading, $cordovaToast) {
+
     });
 
 

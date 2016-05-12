@@ -1,0 +1,106 @@
+<ion-view view-title="项目基本信息">
+  <ion-content>
+    <div class="bar bar-header item-input-inset">
+      <label class="item-input-wrapper">
+                <i class="icon ion-ios-search placeholder-icon"></i>
+                <input type="search" readonly="readonly" placeholder="搜索" ng-click="SearchPA()">
+            </label>
+    </div>
+    <div class="list">
+      <div class="item item-divider">
+        项目基本信息
+      </div>
+      <label class="item item-input">
+          <span class="input-label">项目名称</span>
+          <span class="input-label">{{pavm.ProjectName}}</span>
+        </label>
+      <label class="item item-input">
+          <span class="input-label">建筑面积</span>
+          <span class="input-label">{{pavm.Area}}</span>
+        </label>
+      <label class="item item-input">
+          <span class="input-label">中标价（万元）</span>
+          <span class="input-label">{{pavm.BidPrice}}</span>
+        </label>
+      <label class="item item-input">
+          <span class="input-label">所属县（区）</span>
+          <span class="input-label">{{pavm.County}}</span>
+        </label>
+      <label class="item item-input">
+          <span class="input-label">详细地址</span>
+          <span class="input-label">{{pavm.Adderss}}</span>
+        </label>
+      <label class="item item-input">
+          <span class="input-label">预储金额(元)</span>
+          <span class="input-label">{{pavm.PreSaving}}</span>
+        </label>
+
+      <div class="item item-divider">
+        建设单位信息
+      </div>
+      <label class="item item-input">
+          <span class="input-label">建设单位</span>
+          <span class="input-label">{{pavm.BuildUnit}}</span>
+        </label>
+      <label class="item item-input">
+          <span class="input-label">法人</span>
+          <span class="input-label">{{pavm.BLegalPerson}}</span>
+        </label>
+      <label class="item item-input">
+            <span class="input-label">联系电话</span>
+            <button class="button button-clear button-positive" ng-click="phonecallTab(pavm.BLTel)">{{pavm.BLTel}}</button>
+         </label>
+
+      <div class="item item-divider">
+        施工企业信息
+      </div>
+      <label class="item item-input">
+          <span class="input-label">企业名称</span>
+          <span class="input-label">{{pavm.Construction}}</span>
+        </label>
+      <label class="item item-input">
+          <span class="input-label">法定人</span>
+          <span class="input-label">{{pavm.CLegalPerson}}</span>
+        </label>
+      <label class="item item-input">
+          <span class="input-label">联系电话</span>
+          <button class="button button-clear button-positive" ng-click="phonecallTab(pavm.CLTel)">{{pavm.CLTel}}</button>
+        </label>
+      <label class="item item-input">
+          <span class="input-label">缴纳额</span>
+          <span class="input-label">{{pavm.CContribution}}</span>
+        </label>
+      <label class="item item-input">
+          <span class="input-label">资质等级</span>
+          <span class="input-label">{{pavm.CQualiGrade}}</span>
+        </label>
+      <label class="item item-input">
+          <span class="input-label">资质证号</span>
+          <span class="input-label">{{pavm.CQualiNum}}</span>
+        </label>
+      <label class="item item-input">
+          <span class="input-label">安全许可证号</span>
+          <span class="input-label">{{pavm.CSafeNum}}</span>
+        </label>
+      <label class="item item-input">
+          <span class="input-label">注册地址</span>
+          <span class="input-label">{{pavm.CAddress}}</span>
+        </label>
+      <div class="item item-divider">
+        劳务企业
+      </div>
+      <label class="item item-input">
+          <span class="input-label">企业名称</span>
+          <span class="input-label">{{pavm.LaborUnit}}</span>
+        </label>
+      <label class="item item-input">
+          <span class="input-label">法人</span>
+          <span class="input-label">{{pavm.LLegalPerson}}</span>
+        </label>
+      <label class="item item-input">
+          <span class="input-label">联系电话</span>
+          <button class="button button-clear button-positive" ng-click="phonecallTab(pavm.LLTel)">{{pavm.LLTel}}</button>
+        </label>
+    </div>
+  </ion-content>
+</ion-view>

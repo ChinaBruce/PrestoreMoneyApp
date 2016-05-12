@@ -7,10 +7,12 @@ var remoteUrl = "http://121.28.95.78:93/api/";//"http://121.28.95.78:93/api/";  
 var signatureKey = "prestoremoney.common.2016";
 var token = "";
 var UUID = "";
-var loginUser = {};
+var apptype = 0;
+var loginUser = null;
+var currentPAInfo = null;//当前查询到的预储金账户信息
 
 angular.module('starter', ['ionic', 'starter.controllers', 'ngCordova'])
-  .run(['$ionicPlatform', '$rootScope', '$cordovaAppVersion', '$ionicPopup', '$location', '$ionicHistory', '$cordovaToast', function ($ionicPlatform, $rootScope, $cordovaAppVersion, $ionicPopup, $location, $ionicHistory, $cordovaToast) {
+  .run(['$ionicPlatform', '$rootScope', '$cordovaAppVersion', '$ionicPopup', '$location', '$ionicHistory', '$cordovaToast', "$cordovaDevice", function ($ionicPlatform, $rootScope, $cordovaAppVersion, $ionicPopup, $location, $ionicHistory, $cordovaToast, $cordovaDevice) {
     $ionicPlatform.ready(function ($rootScope) {
       if (window.cordova && window.cordova.plugins.Keyboard) {
         // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
@@ -26,12 +28,18 @@ angular.module('starter', ['ionic', 'starter.controllers', 'ngCordova'])
         StatusBar.styleDefault();
       }
 
+      if ($cordovaDevice.getPlatform() == "Android") {
+        apptype = 2;
+      }
+      else if ($cordovaDevice.getPlatform() == "iOS") {
+        apptype = 1;
+      }
     });
 
     //双击退出  
     $ionicPlatform.registerBackButtonAction(function (e) {
       //判断处于哪个页面时双击退出  
-      if ($location.path() == '/app/record' || $location.path() == '/app/search') {
+      if ($location.path() == '/app/home') {
         if ($rootScope.backButtonPressedOnceToExit) {
           ionic.Platform.exitApp();
         } else {
@@ -64,43 +72,67 @@ angular.module('starter', ['ionic', 'starter.controllers', 'ngCordova'])
   }])
 
   .config(function ($stateProvider, $urlRouterProvider) {
+    //$compileProvider.aHrefSanitizationWhitelist(/^\s*(geo|mailto|tel|maps):/);
     $stateProvider.state('app', {
       url: '/app',
       abstract: true,
       templateUrl: 'templates/menu.html',
-      controller: 'appCtrl',
-      cache: false
+      controller: 'menuCtrl'
     })
       .state('login', {
         url: '/login',
         templateUrl: 'templates/login.html',
-        controller: 'loginCtrl',
+        controller: "loginCtrl",
         cache: false
       })
       .state('app.search', {
         url: '/search',
         views: {
           'menuContent': {
-            templateUrl: 'templates/search.html'
+            templateUrl: 'templates/search.html',
+            controller: "searchCtrl"
           }
-        },
-        cache: false
+        }
       })
 
       .state('app.record', {
         url: '/record',
         views: {
           'menuContent': {
-            templateUrl: 'templates/record.html'
+            templateUrl: 'templates/record.html',
+            controller: "recordCtrl"
           }
-        },
-        cache: false
+        }
       })
+      .state('app.home', {
+        url: '/home',
+        views: {
+          'menuContent': {
+            templateUrl: 'templates/home.html',
+            controller: "homeCtrl"
+          }
+        }
+      })
+      .state('app.takePictures', {
+        url: '/takePictures',
+        views: {
+          'menuContent': {
+            templateUrl: 'templates/takePictures.html',
+            controller: "takePicturesCtrl"
+          }
+        }
+      })
+      
+    //$urlRouterProvider.otherwise('/app/home');
     var loginInfoString = window.localStorage.getItem("loginInfo");
     if (loginInfoString != null && loginInfoString != "") {
       loginUser = JSON.parse(loginInfoString);
+      var cachePrestoreAccount = window.localStorage.getItem("PrestoreAccount");
+      if (cachePrestoreAccount != null && cachePrestoreAccount != "") {
+        currentPAInfo = JSON.parse(cachePrestoreAccount);
+      }
       token = loginUser.Token;
-      $urlRouterProvider.otherwise('/app/record');
+      $urlRouterProvider.otherwise('/app/home');
     }
     else {
       $urlRouterProvider.otherwise('/login');
