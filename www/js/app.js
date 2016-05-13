@@ -72,7 +72,6 @@ angular.module('starter', ['ionic', 'starter.controllers', 'ngCordova'])
   }])
 
   .config(function ($stateProvider, $urlRouterProvider) {
-    //$compileProvider.aHrefSanitizationWhitelist(/^\s*(geo|mailto|tel|maps):/);
     $stateProvider.state('app', {
       url: '/app',
       abstract: true,
@@ -87,6 +86,7 @@ angular.module('starter', ['ionic', 'starter.controllers', 'ngCordova'])
       })
       .state('app.search', {
         url: '/search',
+        params:{'backUrl': ""},
         views: {
           'menuContent': {
             templateUrl: 'templates/search.html',

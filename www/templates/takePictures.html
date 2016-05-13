@@ -1,5 +1,24 @@
 <ion-view view-title="拍照取证">
   <ion-content>
-    
+    <div style='height:50px;line-height: 30px' class="item item-divider item-button-right">
+      照片列表
+      <button class="button button-large button-positive" ng-click="takePicture()">
+        <i class="icon ion-camera"></i>
+      </button>
+    </div>
+    <ion-list>
+      
+      <ion-item ng-repeat="img in imageList">
+        <img src="{{img}}" width="90%">
+      </ion-item>
+      <span ng-show="!imageList.length">没有要上传的图片</span>
+    </ion-list>    
+    <div class="item item-divider">
+      描述
+    </div>
+    <label class="item item-input" style="height:100px">
+      <textarea style="height:100px" ng-model="entity.elseRegulation" placeholder="请您输入问题描述"></textarea>
+    </label>
+    <button class="button button-block button-positive" ng-click="upload()">上传</button>
   </ion-content>
 </ion-view>

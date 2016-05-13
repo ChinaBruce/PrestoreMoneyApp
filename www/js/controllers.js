@@ -1,7 +1,4 @@
 angular.module('starter.controllers', [])
-    .config(['$compileProvider', function($compileProvider){        
-        $compileProvider.aHrefSanitizationWhitelist(/^\s*(geo|mailto|tel|maps):/);
-    }])
     .controller("menuCtrl", function ($scope, $state, $http, $cordovaToast) {
         $scope.loginName = loginUser.Name;
         $scope.logout = function () {
@@ -84,7 +81,7 @@ angular.module('starter.controllers', [])
         };
     })
     //查询
-    .controller("searchCtrl", function ($scope, $rootScope, $http, $state, $ionicLoading, $cordovaToast) {
+    .controller("searchCtrl", function ($scope, $rootScope, $http, $state, $ionicLoading, $cordovaToast, $stateParams) {
         $scope.items = {};
         $scope.searchByKey = function (strInput) {
             var timestamp = (new Date()).valueOf();
@@ -109,7 +106,7 @@ angular.module('starter.controllers', [])
             if (item != undefined) {
                 currentPAInfo = item;
                 window.localStorage.setItem("PrestoreAccount", JSON.stringify(item));
-                $state.go("app.home");
+                $state.go($stateParams.backUrl);
             }
         };
     })
@@ -117,10 +114,10 @@ angular.module('starter.controllers', [])
     .controller("recordCtrl", function ($scope, $rootScope, $http, $state, $ionicLoading, $cordovaToast) {
         $scope.$on("$ionicView.enter", function (event, data) {
             if (currentPAInfo == undefined) {
-                $state.go("app.search");
+                $state.go("app.search", { backUrl: "app.record" });
             }
         });
-        $scope.entity = {elseRegulation:""};
+        $scope.entity = { elseRegulation: "" };
         var timestamp = (new Date()).valueOf();
         var signature = md5('GetDictionaryDetails' + timestamp + signatureKey);
         $http({
@@ -139,6 +136,14 @@ angular.module('starter.controllers', [])
         });
 
         $scope.save = function () {
+            //显示加载动画
+            $ionicLoading.show({
+                content: '',
+                animation: 'fade-in',
+                showBackdrop: true,
+                maxWidth: 200,
+                showDelay: 0
+            });
             var describtion = "";
             $scope.items.forEach(function (element) {
                 if (element.IsChecked) {
@@ -157,8 +162,9 @@ angular.module('starter.controllers', [])
                 method: 'POST',
                 url: remoteUrl + 'LocaleRegulation',
                 data: JSON.stringify({ PrestoreAccountId: currentPAInfo.Id, CheckUserId: loginUser.UserId, Describe: describtion }),
-                headers: {'Content-Type':'application/json', 'apptype': apptype, 'timestamp': timestamp, 'signature': signature, 'token': token }
+                headers: { 'Content-Type': 'application/json', 'apptype': apptype, 'timestamp': timestamp, 'signature': signature, 'token': token }
             }).success(function (response) {
+                $ionicLoading.hide();
                 if (response.IsSuccess) {
                     $scope.entity.elseRegulation = "";
                     $scope.items.forEach(function (element) {
@@ -170,6 +176,7 @@ angular.module('starter.controllers', [])
                     $cordovaToast.showShortTop(response.Message);
                 }
             }).error(function (response) {
+                $ionicLoading.hide();
                 $cordovaToast.showShortTop(response.Message);
             });
         };
@@ -179,7 +186,7 @@ angular.module('starter.controllers', [])
         $scope.pavm = {};
         $scope.$on("$ionicView.enter", function (event, data) {
             if (currentPAInfo == undefined) {
-                $state.go("app.search");
+                $state.go("app.search", { backUrl: "app.home" });
             }
             else {
                 $scope.pavm = currentPAInfo;
@@ -188,14 +195,79 @@ angular.module('starter.controllers', [])
         $scope.SearchPA = function () {
             $state.go("app.search");
         };
-        $scope.phonecallTab = function(phonenumber) {
+        $scope.phonecallTab = function (phonenumber) {
             var call = "tel:" + phonenumber;
             document.location.href = call;
         };
     })
     //现场取证
-    .controller("takePicturesCtrl", function ($scope, $rootScope, $http, $state, $ionicLoading, $cordovaToast) {
+    .controller("takePicturesCtrl", function ($scope, $rootScope, $http, $state, $ionicLoading, $cordovaToast, $cordovaCamera) {
+        $scope.imageList = [];
+        $scope.imageDataList = [];
+        $scope.entity = { elseRegulation: "" };
+        $scope.takePicture = function () {
+            var options = {
+                quality: 100,
+                destinationType: Camera.DestinationType.DATA_URL,
+                sourceType: Camera.PictureSourceType.CAMERA,
+                allowEdit: false,
+                encodingType: Camera.EncodingType.JPEG,
+                targetWidth: 600,
+                targetHeight: 600,
+                popoverOptions: CameraPopoverOptions,
+                saveToPhotoAlbum: false,
+                cameraDirection: 0
+            };
 
+            $cordovaCamera.getPicture(options).then(function (imageData) {                
+                $scope.imageList.push("data:image/jpeg;base64," + imageData);
+                $scope.imageDataList.push(imageData);
+            }, function (err) {
+                $cordovaToast.showShortTop(err);
+            });
+        };
+        $scope.upload = function () {
+            if($scope.imageList.length==0)
+            {
+                $cordovaToast.showShortTop("请拍照后再上传");
+                return;
+            }
+            if($scope.entity.elseRegulation=="")
+            {
+                $cordovaToast.showShortTop("描述不能为空");
+                return;
+            }
+            //显示加载动画
+            $ionicLoading.show({
+                content: '',
+                animation: 'fade-in',
+                showBackdrop: true,
+                maxWidth: 200,
+                showDelay: 0
+            });
+            var timestamp = (new Date()).valueOf();
+            var signature = md5('Add' + timestamp + signatureKey);
+            $http({
+                method: 'POST',
+                url: remoteUrl + 'LocaleRegulation',
+                data: JSON.stringify({ PrestoreAccountId: currentPAInfo.Id, CheckUserId: loginUser.UserId, Describe: $scope.entity.elseRegulation, ImageList: $scope.imageDataList}),
+                headers: { 'Content-Type': 'application/json', 'apptype': apptype, 'timestamp': timestamp, 'signature': signature, 'token': token }
+            }).success(function (response) {
+                $ionicLoading.hide();
+                if (response.IsSuccess) {
+                    $cordovaToast.showShortTop(response.Message);
+                    $scope.entity.elseRegulation = "";
+                    $scope.imageList.splice(0, $scope.imageList.length);
+                    $scope.imageDataList.splice(0, $scope.imageDataList.length);
+                }
+                else {
+                    $cordovaToast.showShortTop(response.Message);
+                }
+            }).error(function (response) {
+                $ionicLoading.hide();
+                $cordovaToast.showShortTop(response.Message);
+            });
+        };
     });
 
 
