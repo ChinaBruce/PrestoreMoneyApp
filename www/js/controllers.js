@@ -193,7 +193,7 @@ angular.module('starter.controllers', [])
             }
         });
         $scope.SearchPA = function () {
-            $state.go("app.search");
+            $state.go("app.search", { backUrl: "app.record" });
         };
         $scope.phonecallTab = function (phonenumber) {
             var call = "tel:" + phonenumber;
