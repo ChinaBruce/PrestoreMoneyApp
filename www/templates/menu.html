@@ -18,16 +18,20 @@
     </ion-header-bar>
     <ion-content>
       <ion-list>
-        <ion-item menu-close href="#/app/home">
+        <ion-item class="item item-icon-left" menu-close href="#/app/home">
+         <i class="icon ion-grid"></i>
           项目信息
         </ion-item>
-        <ion-item menu-close href="#app/record">
+        <ion-item class="item item-icon-left" menu-close href="#app/record">
+          <i class="icon ion-compose"></i>
           问题登记
         </ion-item>
-        <ion-item menu-close href="#app/takePictures">
+        <ion-item class="item item-icon-left" menu-close href="#app/takePictures">
+        <i class="icon ion-camera"></i>
           拍照取证
         </ion-item>        
-        <ion-item menu-close ng-click="logout()">
+        <ion-item class="item item-icon-left" menu-close ng-click="logout()">
+          <i class="icon ion-power"></i>
           退出登录
         </ion-item>
       </ion-list>

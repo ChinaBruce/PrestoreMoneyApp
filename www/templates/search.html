@@ -1,18 +1,20 @@
 <ion-view view-title="查询">
   <ion-content class="has-header">
-    <div class="list list-inset">
-      <label class="item item-input">
+    <div class="bar bar-header item-input-inset">
+      <label class="item-input-wrapper">
           <i class="icon ion-search placeholder-icon"></i>
           <input type="text" ng-change="searchByKey(strInput)" ng-model="strInput" placeholder="项目名称/施工单位名称">
         </label>
+      <button class="button button-positive" ng-click="cancelSearch()">
+        取消
+      </button>
     </div>
-    
+
     <ion-list>
       <ion-item ng-repeat="item in items" ng-click="selectItem(item)">
-       项目名称：{{item.ProjectName}}<br/>
-       施工企业：{{item.Construction}}<br/>
-       所属区域：{{item.County}}
-        </ion-item>
-      </ion-list>
+        项目名称：{{item.ProjectName}}<br/> 施工企业：{{item.Construction}}
+        <br/> 所属区域：{{item.County}}
+      </ion-item>
+    </ion-list>
   </ion-content>
 </ion-view>

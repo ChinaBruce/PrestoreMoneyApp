@@ -109,6 +109,10 @@ angular.module('starter.controllers', [])
                 $state.go($stateParams.backUrl);
             }
         };
+
+        $scope.cancelSearch = function () {
+            $state.go($stateParams.backUrl);
+        };
     })
     //登记问题
     .controller("recordCtrl", function ($scope, $rootScope, $http, $state, $ionicLoading, $cordovaToast) {
@@ -193,7 +197,7 @@ angular.module('starter.controllers', [])
             }
         });
         $scope.SearchPA = function () {
-            $state.go("app.search", { backUrl: "app.record" });
+            $state.go("app.search", { backUrl: "app.home" });
         };
         $scope.phonecallTab = function (phonenumber) {
             var call = "tel:" + phonenumber;
@@ -219,7 +223,7 @@ angular.module('starter.controllers', [])
                 cameraDirection: 0
             };
 
-            $cordovaCamera.getPicture(options).then(function (imageData) {                
+            $cordovaCamera.getPicture(options).then(function (imageData) {
                 $scope.imageList.push("data:image/jpeg;base64," + imageData);
                 $scope.imageDataList.push(imageData);
             }, function (err) {
@@ -227,13 +231,11 @@ angular.module('starter.controllers', [])
             });
         };
         $scope.upload = function () {
-            if($scope.imageList.length==0)
-            {
+            if ($scope.imageList.length == 0) {
                 $cordovaToast.showShortTop("请拍照后再上传");
                 return;
             }
-            if($scope.entity.elseRegulation=="")
-            {
+            if ($scope.entity.elseRegulation == "") {
                 $cordovaToast.showShortTop("描述不能为空");
                 return;
             }
@@ -250,7 +252,7 @@ angular.module('starter.controllers', [])
             $http({
                 method: 'POST',
                 url: remoteUrl + 'LocaleRegulation',
-                data: JSON.stringify({ PrestoreAccountId: currentPAInfo.Id, CheckUserId: loginUser.UserId, Describe: $scope.entity.elseRegulation, ImageList: $scope.imageDataList}),
+                data: JSON.stringify({ PrestoreAccountId: currentPAInfo.Id, CheckUserId: loginUser.UserId, Describe: $scope.entity.elseRegulation, ImageList: $scope.imageDataList }),
                 headers: { 'Content-Type': 'application/json', 'apptype': apptype, 'timestamp': timestamp, 'signature': signature, 'token': token }
             }).success(function (response) {
                 $ionicLoading.hide();
