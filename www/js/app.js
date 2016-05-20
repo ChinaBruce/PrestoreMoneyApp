@@ -12,7 +12,7 @@ var loginUser = null;
 var currentPAInfo = null;//当前查询到的预储金账户信息
 
 angular.module('starter', ['ionic', 'starter.controllers', 'ngCordova'])
-  .run(['$ionicPlatform', '$rootScope', '$cordovaAppVersion', '$ionicPopup', '$location', '$ionicHistory', '$cordovaToast', "$cordovaDevice", function ($ionicPlatform, $rootScope, $cordovaAppVersion, $ionicPopup, $location, $ionicHistory, $cordovaToast, $cordovaDevice) {
+  .run(['$ionicPlatform', '$rootScope', '$ionicActionSheet', '$timeout', '$ionicLoading', '$cordovaAppVersion', '$ionicPopup', '$location', '$ionicHistory', '$cordovaToast', "$cordovaDevice", '$cordovaFileTransfer', function ($ionicPlatform, $rootScope, $ionicActionSheet, $timeout, $ionicLoading, $cordovaAppVersion, $ionicPopup, $location, $ionicHistory, $cordovaToast, $cordovaDevice, $cordovaFileTransfer) {
     $ionicPlatform.ready(function ($rootScope) {
       if (window.cordova && window.cordova.plugins.Keyboard) {
         // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
@@ -34,6 +34,7 @@ angular.module('starter', ['ionic', 'starter.controllers', 'ngCordova'])
       else if ($cordovaDevice.getPlatform() == "iOS") {
         apptype = 1;
       }
+
     });
 
     //双击退出  
@@ -86,7 +87,7 @@ angular.module('starter', ['ionic', 'starter.controllers', 'ngCordova'])
       })
       .state('app.search', {
         url: '/search',
-        params:{'backUrl': ""},
+        params: { 'backUrl': "" },
         views: {
           'menuContent': {
             templateUrl: 'templates/search.html',
@@ -122,7 +123,7 @@ angular.module('starter', ['ionic', 'starter.controllers', 'ngCordova'])
           }
         }
       })
-      
+
     //$urlRouterProvider.otherwise('/app/home');
     var loginInfoString = window.localStorage.getItem("loginInfo");
     if (loginInfoString != null && loginInfoString != "") {

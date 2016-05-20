@@ -22,7 +22,9 @@
     "cordova-plugin-statusbar",
     "ionic-plugin-keyboard",
     "cordova-plugin-camera",
-    "cordova-plugin-app-version"
+    "cordova-plugin-app-version",
+    "cordova-plugin-file",
+    "cordova-plugin-file-transfer"
   ],
   "cordovaPlatforms": []
 }
