@@ -4,6 +4,7 @@
 // 'starter' is the name of this angular module example (also set in a <body> attribute in index.html)
 // the 2nd parameter is an array of 'requires'
 var remoteUrl = "http://121.28.95.78:93/api/";//"http://121.28.95.78:93/api/";  192.168.51.52:45429
+var appRemoteUrl = "http://121.28.95.78:91/app/";
 var signatureKey = "prestoremoney.common.2016";
 var token = "";
 var UUID = "";
@@ -12,7 +13,7 @@ var loginUser = null;
 var currentPAInfo = null;//当前查询到的预储金账户信息
 
 angular.module('starter', ['ionic', 'starter.controllers', 'ngCordova'])
-  .run(['$ionicPlatform', '$rootScope', '$ionicActionSheet', '$timeout', '$ionicLoading', '$cordovaAppVersion', '$ionicPopup', '$location', '$ionicHistory', '$cordovaToast', "$cordovaDevice", '$cordovaFileTransfer', function ($ionicPlatform, $rootScope, $ionicActionSheet, $timeout, $ionicLoading, $cordovaAppVersion, $ionicPopup, $location, $ionicHistory, $cordovaToast, $cordovaDevice, $cordovaFileTransfer) {
+  .run(['$ionicPlatform', '$rootScope', '$ionicActionSheet', '$timeout', '$ionicLoading', '$cordovaAppVersion', '$ionicPopup', '$location', '$ionicHistory', '$cordovaToast', "$cordovaDevice", '$cordovaFileTransfer', '$http', "$cordovaFileOpener2", function ($ionicPlatform, $rootScope, $ionicActionSheet, $timeout, $ionicLoading, $cordovaAppVersion, $ionicPopup, $location, $ionicHistory, $cordovaToast, $cordovaDevice, $cordovaFileTransfer, $http, $cordovaFileOpener2) {
     $ionicPlatform.ready(function ($rootScope) {
       if (window.cordova && window.cordova.plugins.Keyboard) {
         // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
@@ -35,7 +36,64 @@ angular.module('starter', ['ionic', 'starter.controllers', 'ngCordova'])
         apptype = 1;
       }
 
+      cordova.getAppVersion(function (version) {
+        $http({
+          method: 'GET',
+          url: appRemoteUrl + 'version.json'
+        }).success(function (response) {
+          //如果本地与服务端的APP版本不符合
+          if (version != response.appversion) {
+            showUpdateConfirm(version, response.appversion, response.apkname);
+          }
+        })
+        .error(function(err){
+          $cordovaToast.showShortTop(err);
+        });
+      });
     });
+
+    // 显示是否更新对话框
+    function showUpdateConfirm(version, serverappversion, apkname) {
+      var confirmPopup = $ionicPopup.confirm({
+        title: '版本升级',
+        template: '当前版本：' + version + ", 发现新版本：" + serverappversion + ", 是否需要更新？",
+        cancelText: '取消',
+        okText: '升级'
+      });
+      confirmPopup.then(function (res) {
+        if (res) {
+          $ionicLoading.show({
+            template: "已经下载：0%"
+          });
+          var targetPath = "file:///storage/sdcard0/Download/PrestoreMoneyApp/" + apkname; //APP下载存放的路径，可以使用cordova file插件进行相关配置
+          var trustHosts = true
+          var options = {};
+          $cordovaFileTransfer.download(appRemoteUrl + apkname, targetPath, options, trustHosts).then(function (result) {
+            // 打开下载下来的APP
+            $cordovaFileOpener2.open(targetPath, 'application/vnd.android.package-archive'
+            ).then(function () {
+              // 成功
+            }, function (err) {
+              // 错误
+            });
+            $ionicLoading.hide();
+          }, function (err) {
+            alert('下载失败');
+          }, function (progress) {
+            //进度，这里使用文字显示下载百分比
+            $timeout(function () {
+              var downloadProgress = (progress.loaded / progress.total) * 100;
+              $ionicLoading.show({
+                template: "已经下载：" + Math.floor(downloadProgress) + "%"
+              });
+              if (downloadProgress > 99) {
+                $ionicLoading.hide();
+              }
+            })
+          });
+        }
+      });
+    }
 
     //双击退出  
     $ionicPlatform.registerBackButtonAction(function (e) {

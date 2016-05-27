@@ -24,7 +24,8 @@
     "cordova-plugin-camera",
     "cordova-plugin-app-version",
     "cordova-plugin-file",
-    "cordova-plugin-file-transfer"
+    "cordova-plugin-file-transfer",
+    "cordova-plugin-file-opener2"
   ],
   "cordovaPlatforms": []
 }
